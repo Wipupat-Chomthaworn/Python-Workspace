@@ -1,0 +1,103 @@
+import pygame
+from Setting import *
+from Level import Level
+pygame.init()
+
+
+
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Test")
+bg = pygame.image.load('img/Background/forest.png')
+#setframe rate
+clock = pygame.time.Clock()
+FPS = 60
+level = Level(level_map, screen)
+
+#player action variables
+moving_left = False
+moving_right = False
+
+BG = (0, 0, 0)
+
+def draw_bg():
+    screen.fill('black')
+
+class Mobs(pygame.sprite.Sprite):
+    def __init__(self, char_type, x, y, scale, speed):
+        pygame.sprite.Sprite.__init__(self)
+        self.char_type = char_type
+        self.speed = speed
+        self.direction = 1
+        self.flip = False
+        img = pygame.image.load(f'img/{self.char_type}/0.png')
+        self.img = pygame.transform.scale(img, (int(img.get_width() / scale), int(img.get_height() / scale)))
+        self.rect = self.img.get_rect()
+        self.rect.center = (x, y)
+
+    def move(self, moving_left, moving_right):
+        #reset movement
+        dx = 0
+        dy = 0
+        #assigned movement
+        if moving_left and self.rect.x >= 0:
+            dx -= self.speed
+            self.flip = True
+            self.direction = -1
+        elif moving_right and self.rect.x <= screen_width-100:
+            dx += self.speed
+            self.flip = False
+            self.direction = 1
+
+        #update rectangle position
+        self.rect.x += dx
+        self.rect.x += dy
+
+
+    def draw(self):
+        screen.blit(pygame.transform.flip(self.img, self.flip, False), self.rect)
+
+player = Mobs('Player', 200, 610, 6, 5)
+# enemy = Mobs('Enemy', 400, 200, 6, 5)
+
+x = 200
+y = 200
+scale = 4
+
+
+run = True
+while run:
+
+    clock.tick(FPS)
+
+    draw_bg()
+
+    level.run()
+
+    player.draw()
+    # enemy.draw()
+
+    player.move(moving_left, moving_right)
+
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            run = False
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_d:
+                moving_right = True
+            if event.key == pygame.K_a:
+                moving_left = True
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_d:
+                moving_right = False
+            if event.key == pygame.K_a:
+                moving_left = False
+            if event.key == pygame.K_ESCAPE:
+                run = False
+
+
+    pygame.display.update()
+
+pygame.quit()

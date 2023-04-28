@@ -1,0 +1,5 @@
+print(119%100//10)
+sol = int(input())
+solall = (sol%10+(sol%100//10)+(sol%1000//100)+(sol%10000//1000)+(sol%100000//10000))
+print(solall)
+# ()
